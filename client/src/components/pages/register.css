@@ -1,0 +1,5 @@
+@media all and (max-width: 769px) {
+  .form-container {
+    width: 70vw !important;
+  }
+}
