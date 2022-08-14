@@ -1,9 +1,8 @@
 import { Form, Button } from "react-bootstrap";
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { register } from "../../slices/auth";
+import { register, reset } from "../../slices/auth";
 import { toast } from "react-toastify";
-import { clearMessage } from "../../slices/message";
 import { useNavigate } from "react-router-dom";
 import "./register.css";
 
@@ -15,7 +14,7 @@ const EMAIL_REGEX = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 function Register() {
   const userRef = useRef();
   const dispatch = useDispatch();
-  const { message } = useSelector((state) => state.message);
+  const { message, status } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -37,8 +36,6 @@ function Register() {
   const [phone, setPhone] = useState("");
   const [validPhone, setValidPhone] = useState(false);
   const [phoneFocus, setPhoneFocus] = useState(false);
-
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
@@ -70,22 +67,27 @@ function Register() {
   // }, [name, email, pwd, confirmPwd]);
 
   useEffect(() => {
-    if (message?.error) {
-      toast.error(message.message);
+    if (message.length) {
+      if (!status) {
+        toast.error(message);
+        dispatch(reset());
+      } else {
+        toast.success(message);
+        const user = JSON.parse(localStorage.getItem("user"));
+        dispatch(reset());
+        navigate(`/verifyUser/${user._id}`);
+      }
     }
-    if (message?.success) {
-      toast.success(message.message);
-      setSuccess(true);
-    }
-  }, [dispatch, message]);
+  }, [dispatch, message, status, navigate]);
 
-  useEffect(() => {
-    if (success) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      navigate(`verifyUser/${user._id}`);
-      dispatch(clearMessage());
-    }
-  }, [success, dispatch, navigate]);
+  // useEffect(() => {
+  //   if (success) {
+  //     const user = JSON.parse(localStorage.getItem("user"));
+  //     navigate(`verifyUser/${user._id}`);
+  //     dispatch(clearMessage());
+  //   }
+  // }, [success, dispatch, navigate]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const obj = {

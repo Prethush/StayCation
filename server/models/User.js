@@ -18,10 +18,19 @@ const userSchema = new Schema(
     },
     phone_no: {
       type: Number,
+      unique: true,
+      required: true,
     },
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    refreshToken: {
+      type: String,
     },
   },
   { timestamps: true }

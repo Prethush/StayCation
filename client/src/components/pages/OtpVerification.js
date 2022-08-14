@@ -1,28 +1,41 @@
 import { Button, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { otpVerification } from "../../slices/auth";
+import { otpVerification, reset } from "../../slices/auth";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "./otpverification.css";
 
 function OtpVerification() {
   const [formVal, setFormVal] = useState("");
   const [errMsg, setErrMsg] = useState(false);
-  const { message } = useSelector((state) => state.message);
+  const { message, status } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const result = isNaN(formVal);
     setErrMsg(result);
   }, [formVal]);
 
   useEffect(() => {
-    console.log(message, "message");
-    if (message?.error) {
-      toast.error(message.message);
+    if (message.length) {
+      if (!status) {
+        toast.error(message);
+        dispatch(reset());
+      } else {
+        toast.success(message);
+        dispatch(reset());
+        navigate("/home");
+      }
     }
-    if (message?.success) {
-      toast.success(message.message);
-    }
-  }, [dispatch, message]);
+  }, [dispatch, message, navigate, status]);
+
+  // useEffect(() => {
+  //   if (success) {
+  //     navigate("/home");
+  //   }
+  // }, [success, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,7 +43,7 @@ function OtpVerification() {
   };
   return (
     <div className="vh-100 d-flex justify-content-center align-items-center bg-primary">
-      <div className="container" style={{ width: "25vw" }}>
+      <div className="form-container" style={{ width: "25vw" }}>
         <Form
           className="p-5 rounded bg-white"
           onSubmit={(e) => handleSubmit(e)}

@@ -4,11 +4,11 @@ const client = require("twilio")(
 );
 
 function sendOtp(num) {
+  console.log(num);
   num = `+91${num}`;
-  client.verify.v2
+  return client.verify.v2
     .services(process.env.TWILIO_SERVICE_ID)
-    .verifications.create({ to: num, channel: "sms" })
-    .then((verification) => console.log(verification.sid));
+    .verifications.create({ to: num, channel: "sms" });
 }
 
 function verifyOtp(num, val) {
@@ -19,3 +19,6 @@ function verifyOtp(num, val) {
 }
 
 module.exports = { sendOtp, verifyOtp };
+
+// 7559928741
+//sreeshilck777@gmail.com
