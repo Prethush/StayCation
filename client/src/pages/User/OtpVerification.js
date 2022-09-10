@@ -1,14 +1,14 @@
-import { Button, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { otpVerification, reset } from "../../slices/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "./otpverification.css";
+import axios from "axios";
 
 function OtpVerification() {
   const [formVal, setFormVal] = useState("");
   const [errMsg, setErrMsg] = useState(false);
+
   const { message, status } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,29 +26,33 @@ function OtpVerification() {
       } else {
         toast.success(message);
         dispatch(reset());
-        navigate("/home");
+        navigate("/");
       }
     }
   }, [dispatch, message, navigate, status]);
 
-  // useEffect(() => {
-  //   if (success) {
-  //     navigate("/home");
-  //   }
-  // }, [success, navigate]);
+  // resend otp
+  const resendOtp = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    axios
+      .get(`http://localhost:5000/api/user/resend_otp/${user._id}`)
+      .then((res) => toast.success("OTP send Successfully"))
+      .catch((err) => toast.error("Some error has happened, try later"));
+  };
 
+  useEffect(() => {});
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(otpVerification(formVal));
   };
   return (
     <div className="vh-100 d-flex justify-content-center align-items-center bg-primary">
-      <div className="form-container" style={{ width: "25vw" }}>
-        <Form
+      <div className="container col-sm-6 col-lg-4 col-xl-3">
+        <form
           className="p-5 rounded bg-white"
           onSubmit={(e) => handleSubmit(e)}
         >
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <fieldset className="mb-3" id="formBasicEmail">
             <div className="text-center mb-3">
               <span
                 style={{
@@ -57,13 +61,14 @@ function OtpVerification() {
                 }}
               >
                 An OTP has send to your mobile number for verfication. Please
-                enter the OPT
+                enter the OTP
               </span>
             </div>
-            <Form.Control
+            <input
               type="text"
               placeholder="otp"
               onChange={(e) => setFormVal(e.target.value)}
+              className="form-control"
             />
             <span
               className={formVal && errMsg ? "d-block text-danger" : "d-none"}
@@ -71,16 +76,27 @@ function OtpVerification() {
             >
               OTP should be number
             </span>
-          </Form.Group>
-          <Button
+          </fieldset>
+          <button
             variant="primary"
             type="submit"
-            className="w-100"
+            className="w-100 btn btn-primary"
             disabled={errMsg || formVal.length !== 6}
           >
             Submit
-          </Button>
-        </Form>
+          </button>
+          <div>
+            <p className="text-center mt-2" style={{ color: "gray" }}>
+              OTP not received?{" "}
+              <span
+                onClick={resendOtp}
+                style={{ color: "#ff3366", cursor: "pointer" }}
+              >
+                Resend
+              </span>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -30,13 +30,15 @@ const handleRegister = async (req, res, next) => {
       pwd: hashedPwd,
       phone_no: phone,
     });
-    console.log(user, "user");
     const output = await sendOtp(phone);
-
+    const newUser = {
+      name: user.name,
+      _id: user._id,
+    };
     res.status(200).json({
       status: true,
       message: `${name} is successfully resgistered`,
-      user,
+      user: newUser,
     });
   } catch (err) {
     console.log(err, "Err");
@@ -84,13 +86,17 @@ const handleLogin = async (req, res, next) => {
     let user = await User.findOne({ email });
     if (!user) {
       return res
-        .status(401)
+        .status(400)
         .json({ status: false, message: "Email is not registered" });
     }
 
     const result = await bcrypt.compare(pwd, user.pwd);
+    console.log(result, "result");
     if (!result) {
-      return res.json({ status: false, message: "Incorrect Password" });
+      console.log(result, "result");
+      return res
+        .status(400)
+        .json({ status: false, message: "Incorrect Password" });
     }
 
     const accessToken = await jwt.sign(
@@ -99,23 +105,28 @@ const handleLogin = async (req, res, next) => {
       { expiresIn: "20d" }
     );
 
-    const refreshToken = await jwt.sign(
-      { id: user._id },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "50d" }
-    );
-    user = await User.findByIdAndUpdate(user._id, { $set: { refreshToken } });
-    res.cookie("jwt", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 24 * 60 * 60 * 1000 * 7,
-    });
+    // const refreshToken = await jwt.sign(
+    //   { id: user._id },
+    //   process.env.REFRESH_TOKEN_SECRET,
+    //   { expiresIn: "50d" }
+    // );
+    // user = await User.findByIdAndUpdate(user._id, { $set: { refreshToken } });
+    // res.cookie("jwt", refreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "None",
+    //   maxAge: 24 * 60 * 60 * 1000 * 50,
+    // });
+
+    const newUser = {
+      name: user.name,
+      _id: user._id,
+    };
     res.status(200).json({
       status: true,
       message: "User is successfully logged in",
       accessToken,
-      user,
+      user: newUser,
     });
   } catch (err) {
     next(err);
@@ -179,12 +190,47 @@ const handleResetPassword = async (req, res, next) => {
     next(err);
   }
 };
-// handle logout
 
+// resend otp
+const handleResendOtp = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).json({ status: false, message: "User not found" });
+    }
+    const result = await sendOtp(user.phone_no);
+    res
+      .status(200)
+      .json({ status: true, message: "OTP is successfully to your mobile" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// current loggedin user info
+const handleCurrentUserInfo = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id).select(
+      "name email _id createdAt phone_no"
+    );
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: false, message: "No user info found" });
+    }
+    res.status(200).json({ status: true, user });
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
   handleRegister,
   otpVerification,
   handleLogin,
   handleEmailVerification,
   handleResetPassword,
+  handleResendOtp,
+  handleCurrentUserInfo,
 };

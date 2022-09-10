@@ -1,10 +1,14 @@
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 
-function ProtectedRoute({children}) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const { isLoggedIn } = useSelector((state) => state.auth);
+function ProtectedRoute({ children }) {
+  const { accessToken } = localStorage;
 
-  return <div>ProtectedRoute</div>;
+  if (accessToken) {
+    return children;
+  }
+  return <Navigate to="/login" />;
 }
 
 export default ProtectedRoute;

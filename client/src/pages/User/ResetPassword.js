@@ -10,6 +10,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 function ResetPassword() {
   const pwdRef = useRef();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [pwd, setPwd] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
@@ -36,9 +37,11 @@ function ResetPassword() {
         toast.error(message);
       } else {
         toast.success(message);
+        dispatch(reset());
+        navigate("/login");
       }
     }
-  }, [message, dispatch, status]);
+  }, [message, dispatch, status, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -48,16 +51,22 @@ function ResetPassword() {
     dispatch(resetPassword(obj));
   };
   return (
-    <div className="vh-100 d-flex justify-content-center align-items-center bg-primary">
-      <div className="form-container" style={{ width: "25vw" }}>
-        <Form className="p-5 rounded bg-white" onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>New Password</Form.Label>
-            <Form.Control
+    <div className="vh-100 d-flex justify-content-center align-items-center">
+      <div className="container col-sm-6 col-lg-4 col-xl-3">
+        <form
+          className="p-5 rounded bg-white"
+          onSubmit={handleSubmit}
+          style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
+        >
+          <fieldset className="mb-3" id="formBasicEmail">
+            <label htmlFor="pwd">New Password</label>
+            <input
               type="password"
               placeholder="Password"
               ref={pwdRef}
               name="pwd"
+              id="pwd"
+              className="form-control mt-2"
               onChange={(e) => setPwd(e.target.value)}
               onFocus={() => setPwdFocus(true)}
               onBlur={() => setPwdFocus(false)}
@@ -73,13 +82,15 @@ function ResetPassword() {
               atleast one lowercase letter, one uppercase letter and a special
               character
             </p>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formConfirmEmail">
-            <Form.Label>Confirm Password</Form.Label>
-            <Form.Control
+          </fieldset>
+          <fieldset className="mb-3" controlId="formConfirmEmail">
+            <label htmlFor="confirmPwd">Confirm Password</label>
+            <input
               type="password"
               placeholder="Confirm password"
               name="confirmPwd"
+              id="confirmPwd"
+              className="form-control mt-2"
               onChange={(e) => setConfirmPwd(e.target.value)}
               onFocus={() => setConfirmPwdFocus(true)}
               onBlur={() => setConfirmPwdFocus(false)}
@@ -93,16 +104,17 @@ function ResetPassword() {
             >
               Password is incorrect
             </p>
-          </Form.Group>
-          <Button
+          </fieldset>
+          <button
             variant="primary"
             type="submit"
-            className="w-100"
+            className="w-100 btn text-white"
+            style={{ backgroundColor: "#FF3366" }}
             disabled={!validConfirmPwd || !validPwd}
           >
             Reset Password
-          </Button>
-        </Form>
+          </button>
+        </form>
       </div>
     </div>
   );

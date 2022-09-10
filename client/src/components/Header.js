@@ -1,18 +1,32 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import "./Header.css";
+import { useNavigate } from "react-router-dom";
+import userLogo from "../assets/images/user_logo.png";
+import { logout } from "../slices/auth";
+import { useDispatch } from "react-redux";
 
 function Header() {
   const [btnSelected, setBtnSelected] = useState("home");
-
+  const accessToken = JSON.parse(localStorage.getItem("accessToken"));
+  const user = JSON.parse(localStorage.getItem("user"));
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const handleBtnClick = (val) => {
     setBtnSelected(val);
+  };
+
+  const handleLogout = () => {
+    console.log("logout");
+    dispatch(logout());
+    navigate("/");
   };
   return (
     <>
       <Navbar bg="light" expand="lg" className="p-3">
         <Container fluid>
-          <Link to="/home">
+          <Link to="/" onClick={() => handleBtnClick("home")}>
             <svg
               viewBox="0 0 187 20"
               width="9rem"
@@ -36,11 +50,11 @@ function Header() {
             ></Nav>
             <Nav className="d-flex flex-column d-lg-flex flex-lg-row">
               <Link
-                to="#action1"
+                to="/"
                 className={
                   btnSelected === "home"
-                    ? "border-bottom border-2 border-primary text-primary fw-bold text-decoration-none me-4"
-                    : "text-info fw-bold m-r-4 text-decoration-none me-4"
+                    ? "fw-bold me-4 link_elm text-decoration-underline"
+                    : "fw-bold text-decoration-none me-4 link_elm"
                 }
                 onClick={() => handleBtnClick("home")}
               >
@@ -50,35 +64,90 @@ function Header() {
                 to="#action2"
                 className={
                   btnSelected === "link"
-                    ? "border-bottom border-2 border-primary text-primary fw-bold text-decoration-none me-4"
-                    : "text-info fw-bold text-decoration-none me-4"
+                    ? "fw-bold me-4 link_elm text-decoration-underline"
+                    : "fw-bold text-decoration-none me-4 link_elm"
                 }
                 onClick={() => handleBtnClick("link")}
               >
                 Link
               </Link>
-              <Link
-                to="/login"
-                className={
-                  btnSelected === "signin"
-                    ? "border-bottom border-2 border-primary text-primary fw-bold text-decoration-none me-4"
-                    : "text-info fw-bold text-decoration-none me-4"
-                }
-                onClick={() => handleBtnClick("signin")}
-              >
-                Signin
-              </Link>
-              <Link
-                to="/"
-                className={
-                  btnSelected === "signup"
-                    ? "border-bottom border-2 border-primary text-primary fw-bold text-decoration-none me-4"
-                    : "text-info fw-bold text-decoration-none me-4"
-                }
-                onClick={() => handleBtnClick("signup")}
-              >
-                Signup
-              </Link>
+              {accessToken ? (
+                <div className="me-4 dropdown" style={{ cursor: "pointer" }}>
+                  <img
+                    src={userLogo}
+                    alt={user?.name}
+                    style={{ width: "1.5rem" }}
+                  />
+                  <span
+                    style={{ color: "#ff3366", fontWeight: "900" }}
+                    className="dropdown-toggle"
+                    id="dropdownMenuButton1"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    {user?.name}
+                  </span>
+                  <ul
+                    className="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton1"
+                  >
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        to={`/user/profile/${user._id}`}
+                      >
+                        Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <a className="dropdown-item" href="#">
+                        Another action
+                      </a>
+                    </li>
+                    <li>
+                      <a className="dropdown-item" href="#">
+                        Something else here
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className={
+                    btnSelected === "signin"
+                      ? "fw-bold me-4 link_elm text-decoration-underline"
+                      : "fw-bold text-decoration-none me-4 link_elm"
+                  }
+                  onClick={() => handleBtnClick("signin")}
+                >
+                  Signin
+                </Link>
+              )}
+              {accessToken ? (
+                <span
+                  style={{
+                    color: "#ff3366",
+                    fontWeight: "900",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleLogout}
+                >
+                  Logout
+                </span>
+              ) : (
+                <Link
+                  to="/register"
+                  className={
+                    btnSelected === "signup"
+                      ? "fw-bold me-4 link_elm text-decoration-underline"
+                      : "fw-bold text-decoration-none me-4 link_elm md:d-inline"
+                  }
+                  onClick={() => handleBtnClick("signup")}
+                >
+                  Signup
+                </Link>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>

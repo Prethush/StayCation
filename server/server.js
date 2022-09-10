@@ -21,6 +21,8 @@ app.use(cookieParser());
 
 // routes
 app.use("/api/user/", require("./routes/user"));
+app.use("/api/admin", require("./routes/admin"));
+
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
   app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

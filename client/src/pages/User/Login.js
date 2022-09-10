@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Form, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login, reset } from "../../slices/auth";
@@ -13,7 +12,6 @@ function Login() {
   const { message, status } = useSelector((state) => state.auth);
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
-
   useEffect(() => {
     emailRef.current.focus();
   }, []);
@@ -26,7 +24,7 @@ function Login() {
       } else {
         toast.success(message);
         dispatch(reset());
-        navigate("/home");
+        navigate("/");
       }
     }
   }, [dispatch, message, navigate, status]);
@@ -37,56 +35,60 @@ function Login() {
     dispatch(login(obj));
   };
   return (
-    <div
-      className="vh-100 d-flex justify-content-center align-items-center"
-      style={{ backgroundColor: "#696880" }}
-    >
-      <div className="form-container" style={{ width: "30vw" }}>
-        <Form
+    <div className="vh-100 d-flex justify-content-center align-items-center">
+      <div className="container col-md-6 col-lg-5 col-xl-3">
+        <form
           onSubmit={handleSubmit}
           className="p-5 rounded bg-white"
           style={{
             margin: "0 auto",
+            boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
           }}
         >
           <legend className="text-center">Login Form</legend>
           {/* Email Field */}
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Email address</Form.Label>
-            <Form.Control
+          <fieldset className="mb-3" id="formBasicEmail">
+            <label htmlFor="email">Email address</label>
+            <input
               type="text"
               placeholder="Enter email"
-              name="email"
-              onChange={(e) => setEmail(e.target.value)}
+              id="email"
               ref={emailRef}
+              name="email"
+              className="form-control mt-2"
+              onChange={(e) => setEmail(e.target.value)}
             />
-          </Form.Group>
+          </fieldset>
 
           {/* Password Field */}
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
+          <fieldset className="mb-3" id="formBasicPassword">
+            <label htmlFor="pwd">Password</label>
+            <input
               type="password"
               placeholder="Enter password"
               name="pwd"
+              id="pwd"
+              className="form-control mt-2"
               onChange={(e) => setPwd(e.target.value)}
             />
-          </Form.Group>
-          <Button
-            className="w-100"
+          </fieldset>
+          <button
+            className="w-100 btn text-white"
             variant="primary"
             type="submit"
+            style={{ backgroundColor: "#FF3366" }}
             disabled={!email || !pwd}
           >
             Login
-          </Button>
+          </button>
           <Link
             to="/email_verification"
             className="text-decoration-none text-center d-block mt-2"
+            style={{ color: "#FF3366" }}
           >
             <span>Forgot Password</span>
           </Link>
-        </Form>
+        </form>
       </div>
     </div>
   );

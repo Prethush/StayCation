@@ -1,0 +1,24 @@
+.aside {
+  height: 50vh;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.article {
+  padding-left: 3.5rem;
+}
+.form-input {
+  border: 1px solid lightgrey;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  display: none;
+}
+
+.review_sec {
+  margin-top: 2rem;
+}
+
+hr {
+  color: rgb(154, 151, 151);
+}
